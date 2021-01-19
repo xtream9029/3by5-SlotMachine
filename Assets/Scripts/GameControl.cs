@@ -9,6 +9,7 @@ public class GameControl : MonoBehaviour
     //row 클래스에 있는 함수를 실행시키게금 넘겨주는 부분
     public static event Action HandlePulled = delegate { };//PullHandle에서 호출됨
     public static event Action Stop = delegate { };
+    public static event Action rego = delegate { };
 
     [SerializeField]//private 변수를 인스펙터에서 접근 가능하게 해주는 기능
     private Text prizeText;//점수표시
@@ -35,6 +36,7 @@ public class GameControl : MonoBehaviour
             prizeValue = 0;
             prizeText.enabled = false;
             resultsChecked = false;
+           
         }
 
         //모든슬롯의 릴이 멈춰있고 결과 체크값이 거짓일때
@@ -43,6 +45,9 @@ public class GameControl : MonoBehaviour
             CheckResults();//점수 계산하는 부분으로 빠짐
             prizeText.enabled = true;
             prizeText.text = "Prize:" + prizeValue;
+            GameObject.Find("GameControl").transform.Find("spin").gameObject.SetActive(true);
+            GameObject.Find("GameControl").transform.Find("stop").gameObject.SetActive(false);
+
         }
     }//Update
 
@@ -51,8 +56,9 @@ public class GameControl : MonoBehaviour
         //스핀 버튼을 눌렀을때 릴이 움직이는 부분이 실행되는 구간
         //모든 슬롯의 릴이 멈춰져있을때
         //코루틴으로 핸들 움직임 함수를 실행
+
         if (rows[0].rowStopped && rows[1].rowStopped && rows[2].rowStopped && rows[3].rowStopped && rows[4].rowStopped)
-        {
+        {//5개의 릴이 멈춰져있는지만 확인
             PullHandle();
             GameObject.Find("GameControl").transform.Find("spin").gameObject.SetActive(false);
             GameObject.Find("GameControl").transform.Find("stop").gameObject.SetActive(true);
@@ -61,12 +67,9 @@ public class GameControl : MonoBehaviour
         else if(!rows[0].rowStopped || !rows[1].rowStopped || !rows[2].rowStopped || !rows[3].rowStopped || !rows[4].rowStopped)
         {
             StopHandle();//여기서 stop함수가 delegate에 등록되고 stopFlag가 바뀜
-            GameObject.Find("GameControl").transform.Find("spin").gameObject.SetActive(true);
-            GameObject.Find("GameControl").transform.Find("stop").gameObject.SetActive(false);
         }
     }
-
-    //실제로 손잡이가 회전하는 부분을 구현한 부분
+   
     private void PullHandle()
     {
         HandlePulled();
@@ -79,6 +82,7 @@ public class GameControl : MonoBehaviour
 
     private void Mapping_symbol()
     {
+        //슬롯머신 돌린 결과를 2차원 배열에 맵핑하는 함수(점수 계산을 위해)
         for (int i = 0; i < 3; i++)
         {
             for (int j = 0; j < 5; j++)

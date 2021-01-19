@@ -20,7 +20,8 @@ public class Row : MonoBehaviour
     {
         transform.localPosition = new Vector3(transform.localPosition.x, 4.5f, 0);
         rowStopped = true;
-        //함수추가
+
+        //GameControl에서 넘겨준 함수들 from delegate
         GameControl.HandlePulled += StartRotating;
         GameControl.Stop += StopRotating;//단순 플래그처리로 릴을 멈춤
     }
@@ -41,27 +42,12 @@ public class Row : MonoBehaviour
 
     private IEnumerator Rotate()//코루틴
     {
-        rowStopped = false;//슬롯머신의 릴이 돌아야 하므로
+        rowStopped = false;//슬롯머신의 릴이 돌게 되므로
         timeInterval = 0.025f;
-
-        //릴 돌리는 부분을 구현한것
-        //각릴에서 첫번째 심볼과 마지막 심볼이 같아야 봣을때 도는것처럼 보여 질수 있음
-        /*for (int i = 0; i < 30; i++)
-        {
-            if (transform.localPosition.y <= -1.5f)
-            {
-                transform.localPosition = new Vector3(transform.localPosition.x, 4.5f, 0);
-            }
-
-            transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y - 0.5f, 0);
-
-            
-            yield return new WaitForSeconds(timeInterval);
-        }*/
-
+        
         randomValue = Random.Range(60, 100);
 
-        //이 부분이 없으면 슬롯의 심볼이 각 칸에 깔끔하게 떨어지질 않음
+        //이 부분이 없으면 슬롯의 심볼이 각 칸에 깔끔하게 떨어지질 않음 이유는 정확히 모르겠음
         switch (randomValue % 3)
         {
             case 1:
@@ -72,10 +58,12 @@ public class Row : MonoBehaviour
                 break;
         }
 
+        //실제로 릴이 도는 것을 구현한 부분
         for (int i = 0; i < randomValue; i++)
         {
             if (stopFlag)
             {
+                //stop버튼을 누를때 칸에 딱맞게 떨어지지 않을경우에 강제로 슬롯을 정해주기위해 위치를 결정지어줌(약간의 트릭임)
                 if (transform.localPosition.y == 4)
                 {
                     transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y + 0.5f, 0);
@@ -109,10 +97,9 @@ public class Row : MonoBehaviour
                     transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y - 0.5f, 0);
                 }
 
-                //좀더 매끄럽게 진행되는것과 각 칸에 딱맞게 떨어지는 부분을 구현해야함
-                rowStopped = true;
-                break;
-            }
+                stopFlag = false;//stop버튼을 누른이후에 다시 spin버튼을 눌렀을때 릴이 돌수 있게
+                break;//더이상 도는 부분이 실행되지 않음
+            }//stop 버튼을 눌렀을 때
 
             if (transform.localPosition.y <= -1.5f)
             {
@@ -132,8 +119,9 @@ public class Row : MonoBehaviour
                 timeInterval = 0.2f;
 
             yield return new WaitForSeconds(timeInterval);
-        }
+        }//롤이 도는 부분까지(for)
 
+        //===================================================================================================
         //row의 y좌표에따라 심볼들을 결정하는 부분
         if (transform.position.y == 4.5)
         {
