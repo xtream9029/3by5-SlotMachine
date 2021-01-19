@@ -1,0 +1,182 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Row : MonoBehaviour
+{
+    private int randomValue;
+    private float timeInterval;
+
+    public bool rowStopped;
+    public bool stopFlag = false;
+
+    //밑에서 부터 
+    public int row_stoppedSlot1;
+    public int row_stoppedSlot2;
+    public int row_stoppedSlot3;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        transform.localPosition = new Vector3(transform.localPosition.x, 4.5f, 0);
+        rowStopped = true;
+        //함수추가
+        GameControl.HandlePulled += StartRotating;
+        GameControl.Stop += StopRotating;//단순 플래그처리로 릴을 멈춤
+    }
+
+    private void StopRotating()
+    {
+        stopFlag = true;
+    }
+
+    private void StartRotating()
+    {
+        row_stoppedSlot1 = 0;//맨밑
+        row_stoppedSlot2 = 0;//중간
+        row_stoppedSlot3 = 0;//맨위
+
+        StartCoroutine("Rotate");
+    }
+
+    private IEnumerator Rotate()//코루틴
+    {
+        rowStopped = false;//슬롯머신의 릴이 돌아야 하므로
+        timeInterval = 0.025f;
+
+        //릴 돌리는 부분을 구현한것
+        //각릴에서 첫번째 심볼과 마지막 심볼이 같아야 봣을때 도는것처럼 보여 질수 있음
+        /*for (int i = 0; i < 30; i++)
+        {
+            if (transform.localPosition.y <= -1.5f)
+            {
+                transform.localPosition = new Vector3(transform.localPosition.x, 4.5f, 0);
+            }
+
+            transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y - 0.5f, 0);
+
+            
+            yield return new WaitForSeconds(timeInterval);
+        }*/
+
+        randomValue = Random.Range(60, 100);
+
+        //이 부분이 없으면 슬롯의 심볼이 각 칸에 깔끔하게 떨어지질 않음
+        switch (randomValue % 3)
+        {
+            case 1:
+                randomValue += 2;
+                break;
+            case 2:
+                randomValue += 1;
+                break;
+        }
+
+        for (int i = 0; i < randomValue; i++)
+        {
+            if (stopFlag)
+            {
+                if (transform.localPosition.y == 4)
+                {
+                    transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y + 0.5f, 0);
+                }
+                else if (transform.localPosition.y == 3.5)
+                {
+                    transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y - 0.5f, 0);
+                }
+                else if (transform.localPosition.y == 2.5)
+                {
+                    transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y + 0.5f, 0);
+                }
+                else if (transform.localPosition.y == 2)
+                {
+                    transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y - 0.5f, 0);
+                }
+                else if (transform.localPosition.y == 1)
+                {
+                    transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y + 0.5f, 0);
+                }
+                else if (transform.localPosition.y == 0.5)
+                {
+                    transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y - 0.5f, 0);
+                }
+                else if (transform.localPosition.y == -0.5)
+                {
+                    transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y + 0.5f, 0);
+                }
+                else if (transform.localPosition.y == -1)
+                {
+                    transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y - 0.5f, 0);
+                }
+
+                //좀더 매끄럽게 진행되는것과 각 칸에 딱맞게 떨어지는 부분을 구현해야함
+                rowStopped = true;
+                break;
+            }
+
+            if (transform.localPosition.y <= -1.5f)
+            {
+                transform.localPosition = new Vector3(transform.localPosition.x, 4.5f, 0);
+            }
+
+            transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y - 0.5f, 0);
+
+            //실제로 릴이 회전하는 속도를 결정짓는 부분
+            if (i > Mathf.RoundToInt(randomValue * 0.25f))
+                timeInterval = 0.05f;
+            if (i > Mathf.RoundToInt(randomValue * 0.5f))
+                timeInterval = 0.1f;
+            if (i > Mathf.RoundToInt(randomValue * 0.75f))
+                timeInterval = 0.15f;
+            if (i > Mathf.RoundToInt(randomValue * 0.9f))
+                timeInterval = 0.2f;
+
+            yield return new WaitForSeconds(timeInterval);
+        }
+
+        //row의 y좌표에따라 심볼들을 결정하는 부분
+        if (transform.position.y == 4.5)
+        {
+            row_stoppedSlot1 = 1;//다이아몬드
+            row_stoppedSlot2 = 2;//수박
+            row_stoppedSlot3 = 3;//스캐터
+        }
+
+        else if (transform.position.y == 3)
+        {
+            row_stoppedSlot1 = 2;//수박
+            row_stoppedSlot2 = 3;//스캐터
+            row_stoppedSlot3 = 4;//레몬
+        }
+
+        else if (transform.position.y == 1.5)
+        {
+            row_stoppedSlot1 = 3;//스캐터
+            row_stoppedSlot2 = 4;//레몬
+            row_stoppedSlot3 = 5;//체리
+        }
+
+        else if (transform.position.y == 0)
+        {
+            row_stoppedSlot1 = 4;//레몬
+            row_stoppedSlot2 = 5;//체리
+            row_stoppedSlot3 = 6;//바
+        }
+
+        else if (transform.position.y == -1.5)
+        {
+            row_stoppedSlot1 = 5;//체리
+            row_stoppedSlot2 = 6;//바
+            row_stoppedSlot3 = 7;//종
+        }
+
+        rowStopped = true;
+
+    }//Rotate
+
+    private void OnDestroy()
+    {
+        GameControl.HandlePulled -= StartRotating;
+        GameControl.Stop -= StopRotating;
+    }//OnDestroy
+}
