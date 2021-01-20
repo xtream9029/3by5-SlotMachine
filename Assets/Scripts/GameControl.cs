@@ -14,6 +14,10 @@ public class GameControl : MonoBehaviour
     [SerializeField]//private 변수를 인스펙터에서 접근 가능하게 해주는 기능
     private Text prizeText;//점수표시
 
+    public Text goldText;//점수표시
+
+    public InputField InputMoney;
+
     [SerializeField]
     private Row[] rows;//슬롯 열형 배열,초기화를 유니티에서 해주고 있음 (객체를 집어 넣어서)
 
@@ -21,6 +25,9 @@ public class GameControl : MonoBehaviour
     private Transform handle;//손잡이의 위치
 
     private int prizeValue;//실제 점수값
+    public int goldValue=10000;//초기 금액
+    public int bettingGold;
+
 
     private bool resultsChecked = false;
 
@@ -29,14 +36,21 @@ public class GameControl : MonoBehaviour
     void Update()
     {
         //슬롯의 릴이 돌고 점수가 나오는 부분을 컨트롤 하는 부분
+        if (Input.GetKeyDown(KeyCode.Return))//엔터 입력
+        {
+            string tmp = InputMoney.text;//배팅금액 입력
+            bettingGold = Convert.ToInt32(tmp);
+            Debug.Log($"{bettingGold}");
+        }
 
         //5개의 릴중에 하나라도 돌고 있으면 점수 안나옴
         if (!rows[0].rowStopped || !rows[1].rowStopped || !rows[2].rowStopped || !rows[3].rowStopped || !rows[4].rowStopped)
         {
             prizeValue = 0;
             prizeText.enabled = false;
+            goldText.enabled = true;
+            goldText.text = "Gold:" + goldValue;
             resultsChecked = false;
-           
         }
 
         //모든슬롯의 릴이 멈춰있고 결과 체크값이 거짓일때
@@ -45,6 +59,8 @@ public class GameControl : MonoBehaviour
             CheckResults();//점수 계산하는 부분으로 빠짐
             prizeText.enabled = true;
             prizeText.text = "Prize:" + prizeValue;
+            goldValue += prizeValue;
+            goldText.text = "Gold:" + goldValue;
             GameObject.Find("GameControl").transform.Find("spin").gameObject.SetActive(true);
             GameObject.Find("GameControl").transform.Find("stop").gameObject.SetActive(false);
 
@@ -59,9 +75,15 @@ public class GameControl : MonoBehaviour
 
         if (rows[0].rowStopped && rows[1].rowStopped && rows[2].rowStopped && rows[3].rowStopped && rows[4].rowStopped)
         {//5개의 릴이 멈춰져있는지만 확인
-            PullHandle();
-            GameObject.Find("GameControl").transform.Find("spin").gameObject.SetActive(false);
-            GameObject.Find("GameControl").transform.Find("stop").gameObject.SetActive(true);
+
+            if (goldValue - bettingGold >= 0)
+            {
+                goldValue -= bettingGold;
+                goldText.text = "Gold:" + goldValue;
+                PullHandle();
+                GameObject.Find("GameControl").transform.Find("spin").gameObject.SetActive(false);
+                GameObject.Find("GameControl").transform.Find("stop").gameObject.SetActive(true);
+            }
         }
         //5개의 릴중 하나라도 돌고 있을경우에 마우스 클릭시 실행되는 부분
         else if(!rows[0].rowStopped || !rows[1].rowStopped || !rows[2].rowStopped || !rows[3].rowStopped || !rows[4].rowStopped)
@@ -121,117 +143,111 @@ public class GameControl : MonoBehaviour
             }
         }
 
+        int LineBetting = bettingGold / 10;
         switch (max_symbol)
         {
-            case 1://다이아몬드 * 100
-                int t = 100;
+            case 1://다이아몬드 
                 if (max_cnt == 3)
                 {
-                    prizeValue += 3 * t;
+                    prizeValue += 3 * LineBetting;
                 }
                 else if (max_cnt == 4)
                 {
-                    prizeValue += 4 * t;
+                    prizeValue += 5 * LineBetting;
                 }
                 else if (max_cnt == 5)
                 {
-                    prizeValue += 5 * t;
+                    prizeValue += 10 * LineBetting;
                 }
                 break;
 
-            case 2://수박 *200
-                t = 200;
+            case 2://수박
                 if (max_cnt == 3)
                 {
-                    prizeValue += 3 * t;
+                    prizeValue += 3 * LineBetting;
                 }
                 else if (max_cnt == 4)
                 {
-                    prizeValue += 4 * t;
+                    prizeValue += 5 * LineBetting;
                 }
                 else if (max_cnt == 5)
                 {
-                    prizeValue += 5 * t;
+                    prizeValue += 10 * LineBetting;
                 }
                 break;
 
             case 3://스캐터 * 300
-                t = 300;
                 if (max_cnt == 3)
                 {
-                    prizeValue += 3 * t;
+                    prizeValue += 3 * LineBetting;
                 }
                 else if (max_cnt == 4)
                 {
-                    prizeValue += 4 * t;
+                    prizeValue += 5 * LineBetting;
                 }
                 else if (max_cnt == 5)
                 {
-                    prizeValue += 5 * t;
+                    prizeValue += 10 * LineBetting;
                 }
                 break;
 
             case 4://레몬 * 400
-                t = 400;
                 if (max_cnt == 3)
                 {
-                    prizeValue += 3 * t;
+                    prizeValue += 3 * LineBetting;
                 }
                 else if (max_cnt == 4)
                 {
-                    prizeValue += 4 * t;
+                    prizeValue += 5 * LineBetting;
                 }
                 else if (max_cnt == 5)
                 {
-                    prizeValue += 5 * t;
+                    prizeValue += 10 * LineBetting;
                 }
                 break;
 
             case 5://체리 * 500
-                t = 500;
                 if (max_cnt == 3)
                 {
-                    prizeValue += 3 * t;
+                    prizeValue += 3 * LineBetting;
                 }
                 else if (max_cnt == 4)
                 {
-                    prizeValue += 4 * t;
+                    prizeValue += 5 * LineBetting;
                 }
                 else if (max_cnt == 5)
                 {
-                    prizeValue += 5 * t;
+                    prizeValue += 10 * LineBetting;
                 }
                 break;
 
             case 6://바 * 600
-                t = 600;
                 if (max_cnt == 3)
                 {
-                    prizeValue += 3 * t;
+                    prizeValue += 3 * LineBetting;
                 }
                 else if (max_cnt == 4)
                 {
-                    prizeValue += 4 * t;
+                    prizeValue += 5 * LineBetting;
                 }
                 else if (max_cnt == 5)
                 {
-                    prizeValue += 5 * t;
+                    prizeValue += 10 * LineBetting;
                 }
                 break;
 
             case 7://종 * 700
-                t = 700;
                 if (max_cnt == 3)
                 {
-                    prizeValue += 3 * t;
+                    prizeValue += 3 * LineBetting;
                 }
                 else if (max_cnt == 4)
                 {
-                    prizeValue += 4 * t;
+                    prizeValue += 5 * LineBetting;
                 }
                 else if (max_cnt == 5)
                 {
-                    prizeValue += 5 * t;
+                    prizeValue += 10 * LineBetting;
                 }
                 break;
         }//switch

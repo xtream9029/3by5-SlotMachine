@@ -28,6 +28,7 @@ public class Row : MonoBehaviour
 
     private void StopRotating()
     {
+        //stop버튼을 눌렀을때 전역플래그 처리로 릴의 움직임을 강제로 정지시킴
         stopFlag = true;
     }
 
@@ -45,7 +46,8 @@ public class Row : MonoBehaviour
         rowStopped = false;//슬롯머신의 릴이 돌게 되므로
         timeInterval = 0.025f;
         
-        randomValue = Random.Range(60, 100);
+
+        randomValue = Random.Range(40, 60);
 
         //이 부분이 없으면 슬롯의 심볼이 각 칸에 깔끔하게 떨어지질 않음 이유는 정확히 모르겠음
         switch (randomValue % 3)
@@ -108,7 +110,7 @@ public class Row : MonoBehaviour
 
             transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y - 0.5f, 0);
 
-            //실제로 릴이 회전하는 속도를 결정짓는 부분
+            //실제로 릴이 회전하는 속도를 결정짓는 부분,이 부분이 슬롯을 결정짓는 것과 연관이 있는지는 모르겠음
             if (i > Mathf.RoundToInt(randomValue * 0.25f))
                 timeInterval = 0.05f;
             if (i > Mathf.RoundToInt(randomValue * 0.5f))
