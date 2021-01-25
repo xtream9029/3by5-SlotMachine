@@ -15,6 +15,8 @@ public class GameControl : MonoBehaviour
     private Text prizeText;//점수표시
 
     public Text goldText;//점수표시
+    public Text bettingText;
+    public Text errorText;
 
     public InputField InputMoney;
 
@@ -35,12 +37,26 @@ public class GameControl : MonoBehaviour
 
     void Update()
     {
+
         //슬롯의 릴이 돌고 점수가 나오는 부분을 컨트롤 하는 부분
         if (Input.GetKeyDown(KeyCode.Return))//엔터 입력
         {
             string tmp = InputMoney.text;//배팅금액 입력
-            bettingGold = Convert.ToInt32(tmp);
-            Debug.Log($"{bettingGold}");
+            bettingGold = Convert.ToInt32(tmp);//string -> int 
+
+            //가지고 있는 금액보다 더 많은 금액을 배팅했을때 배팅이 안되는 부분을 구현
+            if (bettingGold > goldValue)
+            {
+                GameObject.Find("Betting").transform.Find("BettingText").gameObject.SetActive(false);
+                GameObject.Find("Error").transform.Find("ErrorText").gameObject.SetActive(true);
+                errorText.text = "Not enough money!";
+            }
+            else
+            {
+                GameObject.Find("Betting").transform.Find("BettingText").gameObject.SetActive(true);
+                GameObject.Find("Error").transform.Find("ErrorText").gameObject.SetActive(false);
+                bettingText.text = "Betting gold is" +" "+bettingGold +"!";
+            }
         }
 
         //5개의 릴중에 하나라도 돌고 있으면 점수 안나옴

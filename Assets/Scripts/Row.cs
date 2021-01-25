@@ -44,10 +44,9 @@ public class Row : MonoBehaviour
     private IEnumerator Rotate()//코루틴
     {
         rowStopped = false;//슬롯머신의 릴이 돌게 되므로
-        timeInterval = 0.025f;
         
 
-        randomValue = Random.Range(40, 60);
+        randomValue = Random.Range(60, 120);
 
         //이 부분이 없으면 슬롯의 심볼이 각 칸에 깔끔하게 떨어지질 않음 이유는 정확히 모르겠음
         switch (randomValue % 3)
@@ -120,7 +119,7 @@ public class Row : MonoBehaviour
             if (i > Mathf.RoundToInt(randomValue * 0.9f))
                 timeInterval = 0.2f;
 
-            yield return new WaitForSeconds(timeInterval);
+            yield return null;
         }//롤이 도는 부분까지(for)
 
         //===================================================================================================
